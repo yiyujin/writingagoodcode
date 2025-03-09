@@ -1,0 +1,31 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: monospace;
+  font-size: 12px;
+  color: white;
+
+  overflow:hidden; 
+  
+  background-color : transparent;
+}
+canvas {
+  display: block;
+  
+  z-index : 99 !important; 
+  
+/*   filter : blur(2px) contrast(200%); */
+}
+
+#canvas{
+    filter : blur(2px) contrast(200%);
+}
+
+#video{
+  width : 960px;
+  height : 540px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: -1;
+}
