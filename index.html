@@ -10,20 +10,18 @@
       //FETCH DATA
       const response = await fetch('./sourcecode.txt');
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      
       const sourcecode = await response.text();
-
-      const container = document.getElementById("step-analysis");
-
       let txt = sourcecode.split("\n").map(line => line.trim());
 
       let data = [];
       let a, b, cnt;
 
-      for(let i = 0; i < txt.length; i++){ //for all the words, 
-
-        if(txt[i].startsWith('//')){ //if it's a match,
+      //DETECT STEP
+      for(let i = 0; i < txt.length; i++){
+        if(txt[i].startsWith('//')){
           data.push({
-              index: i,//original line index
+              index: i,
               content: txt[i].slice(2),
           }); 
         }
@@ -31,22 +29,22 @@
 
       //CALCULATE DIFF (LENGTH, BAR, VOL..)
       for(let i = 0; i < data.length; i++){
-        //cnt = b - a - 1 (to get numbers between a and b, excluding a and b)
         a = data[i].index;
 
-        if(i < data.length - 1){
-            b = data[i + 1].index;
-        }else{ //for the last step,
-            b = txt.length - 1;
+        if( i < data.length - 1 ){
+          b = data[i + 1].index;
+        } else {
+          b = txt.length - 1;
         }
 
         cnt = b - a - 1;
-
-        //ADD THAT TO THE ARRAY
+        
         data[i].cnt = cnt;
       }
 
       // HTML
+      const container = document.getElementById("step-analysis");
+      
       const title = document.createElement("p");
       title.textContent = `Step Analysis (${data.length}):`;
       container.appendChild(title);
