@@ -1,51 +1,298 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.5.0/p5.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.5.0/addons/p5.sound.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <meta charset="utf-8" />
-    
-    <script src="https://unpkg.com/p5-webserial@0.1.1/build/p5.webserial.js"> </script>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Step Analysis</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    .meta2 {
+      font-weight: bold;
+    }
+    .meta3 {
+      font-size: 12px;
+    }
+    .step-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .step-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 48px;
+    }
+    .bar-visual {
+      width: 16px;
+      background-color: #000;
+    }
+  </style>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
 
-  </head>
-  <body>
-    <main>
-<!-- <iframe
-  id="video"
-  src="https://www.youtube.com/embed/6WkTha9ejKM?autoplay=1&loop=1&start=1050&playlist=6WkTha9ejKM"
-  allow="autoplay"
-  type="video/mp4"
-></iframe> -->
-      
-      <iframe width="1920" height="1080"
-  id="video"
-  src="https://www.youtube.com/embed/zw0_tWROnvU?autoplay=1&loop=1&start=1050&playlist=6WkTha9ejKM"
-  allow="autoplay"
-  type="video/mp4"
-></iframe>
-      
-    </main>
-    <div id = "sourceCode">xx</div>
-    <script src="sketch.js"></script>
-    <script src="Particle.js"></script>
-    
-    <div style="display: flex; flex-direction: row; gap: 80px;">
-        <div class="buttons" id="teamA">
-            <button class="player-btn">Player</button>
-            <button class="player-btn">Player</button>
-            <button class="player-btn">Player</button>
-            <button class="player-btn">Player</button>
-            <button class="player-btn">Player</button>
-        </div>
+      // Mock sourcecode input
+      const sourcecode = `
+      //DECLARE VARIABLES
+      r = 100;
+      r2 = 150;
 
-        <div class="buttons" id="teamB">
-            <button class="player-btn">Player</button>
-            <button class="player-btn">Player</button>
-            <button class="player-btn">Player</button>
-            <button class="player-btn">Player</button>
-            <button class="player-btn">Player</button>
-        </div>
-    </div>
-  </body>
+      isQ = false;
+      qR = 0;
+      qSw = 40;
+      qAmt = 10;
+      qOpa = 0;
+
+      amt = 1; //speed
+      amts = [0, 0, 0, 0, 0, 0, 0, 10, 10, 1]; //probability;
+
+      s = 270; //starting angle
+      e = 360; //ending angle
+
+      overwatchYellow = '#FFC107';
+
+      function preload(){
+        overwatch = loadFont('koverwatch.ttf');
+      }
+
+      function setup() {
+        //CANVAS SETTINGS
+        createCanvas(400, 400);
+        background(0);
+        angleMode(DEGREES);
+        imageMode(CENTER);
+        translate(width/2, height/2);
+        
+        textAlign(CENTER, CENTER);
+        textFont(overwatch);
+        
+        //GRAPHICS SETTINGS
+        g = createGraphics(400,400);
+        g.angleMode(DEGREES);
+        g.background(0);
+        g.translate(width/2, height/2);
+        g.scale(-1,1);
+      }
+
+      function draw() {
+        background(0);
+        translate(width/2, height/2);
+        
+        no = 18;
+        a = 90;
+        w = 2;
+        
+        //DRAW INNERMOST CIRCLE
+        strokeWeight(4);
+        stroke(overwatchYellow);
+        noFill();
+        circle(0, 0, r);
+        
+        for(i = 0; i < no; i++){
+          stroke('cyan'); //developer mode -> 'cyan'
+          stroke(0);
+          strokeWeight(4);
+          p = createVector(cos(a)*r, sin(a)*r);
+          
+          line(-p.x, -p.y, p.x, p.y);
+          
+          a += (360 / no);
+        }
+        
+        //DRAW INNER CIRCLE
+        strokeWeight(16);
+        stroke(255, 50);
+        noFill();
+        circle(0, 0, r2 + 8);
+        
+        for(i = 0; i < 36; i++){
+          stroke(0);
+          strokeWeight(2);
+          s = createVector(cos(a)*(r2/2-14), sin(a)*(r2/2-14));
+          e = createVector(cos(a)*(r2/2+14), sin(a)*(r2/2+14));
+          
+          line(s.x, s.y, e.x, e.y);
+          
+          a += (360/36);
+        }
+        
+        //DRAW OUTER CIRCLE
+        image(g,0,0);
+        g.strokeWeight(28);
+        g.stroke(overwatchYellow);
+        g.noFill();
+        g.circle(0,0,r2);
+
+        for(i = 0; i < 36; i++){
+          g.stroke(0);
+          g.strokeWeight(2);
+          s = createVector(cos(a)*(r2/2-16), sin(a)*(r2/2-16));
+          e = createVector(cos(a)*(r2/2+16), sin(a)*(r2/2+16));
+          
+          g.line(s.x, s.y, e.x, e.y);
+          
+          a += (360/36);
+        }
+        
+        s = 270; //erase 역할을 하는 arc
+        e = 360;
+        
+        g.erase();
+          g.noStroke();
+          g.fill(0);
+          g.arc(0, 0, r2*1.5, r2*1.5, s, s + e - amt);
+        g.noErase();
+        
+        amt += 1; //speed
+        
+        //RUN ULTIMATE EFFECT
+        qEffect();
+        
+        if(amt >= 360){
+          amt = 1; //reset amount after one cycle
+
+          qAmt = 10;
+          qOpa = 255;
+        }else{
+          amt += random(amts); //random increasing effect
+          
+          if(qR >= 600){ 
+            qR = 0; //reset q values
+            qSw = 40;
+            qAmt = 0;
+            qOpa = 0;
+          }
+          
+        }
+        
+        //SHOW PERCENTAGE
+        printVal = int(map(amt, 1, 360, 0, 100));
+
+        push();
+          shearX(-8); //for italic effect
+        
+          textSize(64);
+          fill(255);
+          noStroke();
+          text(printVal, -2, -4);
+
+          textSize(24);
+          text('%', 30, 8);
+        pop();
+        
+        //DRAW OUTERMOST CIRCLE
+        stroke(255,30);
+        noFill();
+        circle(0,0,r2*1.8);
+        
+        //DRAW Q ICON
+        stroke(255, qOpa + 80);
+        fill(255, qOpa - 100);
+        circle(0, (r2 * 1.8)/2, 48);
+        
+        noStroke();
+        fill(255, qOpa + 80);
+        textSize(32);
+        text('Q', 0, (r2 * 1.77) / 2);
+      }
+
+      //CREATE ULTIMATE EFFECT
+      function qEffect(){
+        push();
+          stroke(255, qOpa);
+          strokeWeight(qSw);
+          noFill();
+          circle(0, 0, qR);
+        
+          qR += qAmt; //increase circle radius
+          qSw -= qAmt * 0.1; //decrease circle strokeWeight
+        pop();
+      }
+        `;
+
+      const container = document.getElementById("step-analysis");
+
+      let txt = sourcecode.split("\n").map(line => line.trim());
+
+      let data = [];
+      let a, b, cnt;
+
+      for(let i = 0; i < txt.length; i++){ //for all the words, 
+
+        if(txt[i].startsWith('//')){ //if it's a match,
+          data.push({
+              index: i,//original line index
+              content: txt[i].slice(2),
+          }); 
+        }
+      }
+
+      //CALCULATE DIFF (LENGTH, BAR, VOL..)
+      for(let i = 0; i < data.length; i++){
+        //cnt = b - a - 1 (to get numbers between a and b, excluding a and b)
+        a = data[i].index;
+
+        if(i < data.length - 1){
+            b = data[i + 1].index;
+        }else{ //for the last step,
+            b = txt.length - 1;
+        }
+
+        cnt = b - a - 1;
+
+        //ADD THAT TO THE ARRAY
+        data[i].cnt = cnt;
+      }
+
+      // Create content
+      const title = document.createElement("p");
+      title.textContent = `Step Analysis (${data.length}):`;
+      container.appendChild(title);
+
+      const table = document.createElement("table");
+      const headerRow = document.createElement("tr");
+      const headerCell = document.createElement("th");
+      headerCell.className = "meta3";
+      headerCell.textContent = "lines · step name";
+      headerRow.appendChild(headerCell);
+      table.appendChild(headerRow);
+      container.appendChild(table);
+
+      data.forEach(item => {
+        const row = document.createElement("div");
+        row.className = "step-row";
+
+        const barContainer = document.createElement("div");
+        barContainer.className = "step-bar";
+
+        const bar = document.createElement("span");
+        bar.className = "bar-visual";
+        bar.style.height = `${item.cnt}px`;
+
+        const countText = document.createElement("p");
+        countText.className = "meta3";
+        countText.textContent = item.cnt;
+
+        barContainer.appendChild(bar);
+        barContainer.appendChild(countText);
+
+        const stepText = document.createElement("p");
+        stepText.className = "meta2";
+        stepText.textContent = `· ${item.content}`;
+
+        row.appendChild(barContainer);
+        row.appendChild(stepText);
+
+        container.appendChild(row);
+      });
+
+    });
+  </script>
+</head>
+<body>
+  <div id="step-analysis"></div>
+</body>
 </html>
