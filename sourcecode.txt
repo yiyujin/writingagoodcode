@@ -1,0 +1,175 @@
+      //DECLARE VARIABLES
+      r = 100;
+      r2 = 150;
+
+      isQ = false;
+      qR = 0;
+      qSw = 40;
+      qAmt = 10;
+      qOpa = 0;
+
+      amt = 1; //speed
+      amts = [0, 0, 0, 0, 0, 0, 0, 10, 10, 1]; //probability;
+
+      s = 270; //starting angle
+      e = 360; //ending angle
+
+      overwatchYellow = '#FFC107';
+
+      function preload(){
+        overwatch = loadFont('koverwatch.ttf');
+      }
+
+      function setup() {
+        //CANVAS SETTINGS
+        createCanvas(400, 400);
+        background(0);
+        angleMode(DEGREES);
+        imageMode(CENTER);
+        translate(width/2, height/2);
+        
+        textAlign(CENTER, CENTER);
+        textFont(overwatch);
+        
+        //GRAPHICS SETTINGS
+        g = createGraphics(400,400);
+        g.angleMode(DEGREES);
+        g.background(0);
+        g.translate(width/2, height/2);
+        g.scale(-1,1);
+      }
+
+      function draw() {
+        background(0);
+        translate(width/2, height/2);
+        
+        no = 18;
+        a = 90;
+        w = 2;
+        
+        //DRAW INNERMOST CIRCLE
+        strokeWeight(4);
+        stroke(overwatchYellow);
+        noFill();
+        circle(0, 0, r);
+        
+        for(i = 0; i < no; i++){
+          stroke('cyan'); //developer mode -> 'cyan'
+          stroke(0);
+          strokeWeight(4);
+          p = createVector(cos(a)*r, sin(a)*r);
+          
+          line(-p.x, -p.y, p.x, p.y);
+          
+          a += (360 / no);
+        }
+        
+        //DRAW INNER CIRCLE
+        strokeWeight(16);
+        stroke(255, 50);
+        noFill();
+        circle(0, 0, r2 + 8);
+        
+        for(i = 0; i < 36; i++){
+          stroke(0);
+          strokeWeight(2);
+          s = createVector(cos(a)*(r2/2-14), sin(a)*(r2/2-14));
+          e = createVector(cos(a)*(r2/2+14), sin(a)*(r2/2+14));
+          
+          line(s.x, s.y, e.x, e.y);
+          
+          a += (360/36);
+        }
+        
+        //DRAW OUTER CIRCLE
+        image(g,0,0);
+        g.strokeWeight(28);
+        g.stroke(overwatchYellow);
+        g.noFill();
+        g.circle(0,0,r2);
+
+        for(i = 0; i < 36; i++){
+          g.stroke(0);
+          g.strokeWeight(2);
+          s = createVector(cos(a)*(r2/2-16), sin(a)*(r2/2-16));
+          e = createVector(cos(a)*(r2/2+16), sin(a)*(r2/2+16));
+          
+          g.line(s.x, s.y, e.x, e.y);
+          
+          a += (360/36);
+        }
+        
+        s = 270; //erase 역할을 하는 arc
+        e = 360;
+        
+        g.erase();
+          g.noStroke();
+          g.fill(0);
+          g.arc(0, 0, r2*1.5, r2*1.5, s, s + e - amt);
+        g.noErase();
+        
+        amt += 1; //speed
+        
+        //RUN ULTIMATE EFFECT
+        qEffect();
+        
+        if(amt >= 360){
+          amt = 1; //reset amount after one cycle
+
+          qAmt = 10;
+          qOpa = 255;
+        }else{
+          amt += random(amts); //random increasing effect
+          
+          if(qR >= 600){ 
+            qR = 0; //reset q values
+            qSw = 40;
+            qAmt = 0;
+            qOpa = 0;
+          }
+          
+        }
+        
+        //SHOW PERCENTAGE
+        printVal = int(map(amt, 1, 360, 0, 100));
+
+        push();
+          shearX(-8); //for italic effect
+        
+          textSize(64);
+          fill(255);
+          noStroke();
+          text(printVal, -2, -4);
+
+          textSize(24);
+          text('%', 30, 8);
+        pop();
+        
+        //DRAW OUTERMOST CIRCLE
+        stroke(255,30);
+        noFill();
+        circle(0,0,r2*1.8);
+        
+        //DRAW Q ICON
+        stroke(255, qOpa + 80);
+        fill(255, qOpa - 100);
+        circle(0, (r2 * 1.8)/2, 48);
+        
+        noStroke();
+        fill(255, qOpa + 80);
+        textSize(32);
+        text('Q', 0, (r2 * 1.77) / 2);
+      }
+
+      //CREATE ULTIMATE EFFECT
+      function qEffect(){
+        push();
+          stroke(255, qOpa);
+          strokeWeight(qSw);
+          noFill();
+          circle(0, 0, qR);
+        
+          qR += qAmt; //increase circle radius
+          qSw -= qAmt * 0.1; //decrease circle strokeWeight
+        pop();
+      }
