@@ -4,89 +4,88 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Step Analysis</title>
-  <link rel = "stylesheet" href = "style.css">
+  <link rel="stylesheet" href="style.css">
   <script>
-    document.addEventListener("DOMContentLoaded", async function() {
-      //FETCH DATA
-      const response = await fetch('./sourcecode.txt');
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      
-      const sourcecode = await response.text();
-      let txt = sourcecode.split("\n").map(line => line.trim());
+    document.addEventListener("DOMContentLoaded", async () => {
+      try {
+        const sourceCodeText = await fetchSourceCode('./sourcecode.txt');
+        const data = detectStep(sourceCodeText);
+        const enricheddata = computeLineDifferences(data, sourceCodeText);
+        renderStepAnalysis(enricheddata);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    });
 
-      let data = [];
-      let a, b, cnt;
+    async function fetchSourceCode(url) {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const text = await response.text();
+      return text.split("\n").map(line => line.trim());
+    }
 
-      //DETECT STEP
-      for(let i = 0; i < txt.length; i++){
-        if(txt[i].startsWith('//')){
+    function detectStep(lines) {
+      return lines.reduce((data, line, index) => {
+        if (line.startsWith('//')) {
           data.push({
-              index: i,
-              content: txt[i].slice(2),
-          }); 
+            lineIndex: index,
+            content: line.slice(2).trim()
+          });
         }
-      }
+        return data;
+      }, []);
+    }
 
-      //CALCULATE DIFF (LENGTH, BAR, VOL..)
-      for(let i = 0; i < data.length; i++){
-        a = data[i].index;
+    function computeLineDifferences(data, allLines) {
+      return data.map((item, index) => {
+        const startIndex = item.lineIndex;
+        const nextIndex = index < data.length - 1 ? data[index + 1].lineIndex : allLines.length - 1;
+        const lineCount = nextIndex - startIndex - 1;
+        return { ...item, lineCount };
+      });
+    }
 
-        if( i < data.length - 1 ){
-          b = data[i + 1].index;
-        } else {
-          b = txt.length - 1;
-        }
+    function createElementWithProps(tag, className = '', textContent = '') {
+      const element = document.createElement(tag);
+      if (className) element.className = className;
+      if (textContent) element.textContent = textContent;
+      return element;
+    }
 
-        cnt = b - a - 1;
-        
-        data[i].cnt = cnt;
-      }
-
-      // HTML
+    function renderStepAnalysis(data) {
       const container = document.getElementById("step-analysis");
-      
-      const title = document.createElement("p");
-      title.textContent = `Step Analysis (${data.length}):`;
+      container.innerHTML = '';
+
+      const title = createElementWithProps("p", "", `Step Analysis (${data.length}):`);
       container.appendChild(title);
 
       const table = document.createElement("table");
       const headerRow = document.createElement("tr");
-      const headerCell = document.createElement("th");
-      headerCell.className = "meta3";
-      headerCell.textContent = "lines · step name";
+      const headerCell = createElementWithProps("th", "meta3", "lines · step name");
       headerRow.appendChild(headerCell);
       table.appendChild(headerRow);
       container.appendChild(table);
 
       data.forEach(item => {
-        const row = document.createElement("div");
-        row.className = "step-row";
+        const rowContainer = createElementWithProps("div", "step-row");
 
-        const barContainer = document.createElement("div");
-        barContainer.className = "step-bar";
+        const barContainer = createElementWithProps("div", "step-bar");
+        const barVisual = createElementWithProps("span", "bar-visual");
+        barVisual.style.height = `${item.lineCount}px`;
+        barContainer.appendChild(barVisual);
 
-        const bar = document.createElement("span");
-        bar.className = "bar-visual";
-        bar.style.height = `${item.cnt}px`;
+        const countDisplay = createElementWithProps("p", "meta3", item.lineCount.toString());
+        barContainer.appendChild(countDisplay);
 
-        const countText = document.createElement("p");
-        countText.className = "meta3";
-        countText.textContent = item.cnt;
+        const stepDescription = createElementWithProps("p", "meta2", `· ${item.content}`);
 
-        barContainer.appendChild(bar);
-        barContainer.appendChild(countText);
-
-        const stepText = document.createElement("p");
-        stepText.className = "meta2";
-        stepText.textContent = `· ${item.content}`;
-
-        row.appendChild(barContainer);
-        row.appendChild(stepText);
-
-        container.appendChild(row);
+        rowContainer.appendChild(barContainer);
+        rowContainer.appendChild(stepDescription);
+        container.appendChild(rowContainer);
       });
-
-    });
+    }
   </script>
 </head>
 <body>
