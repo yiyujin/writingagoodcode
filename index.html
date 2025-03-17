@@ -4,33 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Step Analysis</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      padding: 20px;
-    }
-    .meta2 {
-      font-weight: bold;
-    }
-    .meta3 {
-      font-size: 12px;
-    }
-    .step-row {
-      display: flex;
-      align-items: center;
-      margin-bottom: 4px;
-    }
-    .step-bar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      width: 48px;
-    }
-    .bar-visual {
-      width: 16px;
-      background-color: #000;
-    }
-  </style>
+  <link rel = "stylesheet" href = "style.css">
   <script>
     document.addEventListener("DOMContentLoaded", async function() {
       //FETCH DATA
@@ -72,7 +46,7 @@
         data[i].cnt = cnt;
       }
 
-      // Create content
+      // HTML
       const title = document.createElement("p");
       title.textContent = `Step Analysis (${data.length}):`;
       container.appendChild(title);

@@ -1,11 +1,25 @@
-html, body {
-  margin: 0;
-  padding: 0;
-  font-family: monospace;
+body {
+  font-family: sans-serif;
+  padding: 20px;
+}
+.meta2 {
+  font-weight: bold;
+}
+.meta3 {
   font-size: 12px;
-  color: white;
-
-  overflow:hidden; 
-  
-  background-color : transparent;
+}
+.step-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.step-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 48px;
+}
+.bar-visual {
+  width: 16px;
+  background-color: #000;
 }
